@@ -4,7 +4,7 @@ import platform
 import sys
 
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 from discord.ext.commands import Bot
 
 if not os.path.isfile("config.json"):

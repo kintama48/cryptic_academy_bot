@@ -20,11 +20,17 @@ bot = Bot(command_prefix=config["bot_prefix"], intents=intents)
 
 @bot.event
 async def on_ready():
+    if not status_task.is_running():
+        status_task.start()
     print(f"Logged in as {bot.user.name}")
     print(f"Discord.py API version: {discord.__version__}")
     print(f"Python version: {platform.python_version()}")
     print(f"Running on: {platform.system()} {platform.release()} ({os.name})")
 
+@tasks.loop(minutes=1.0)
+async def status_task():    # to set a game's status
+    statuses = ["with you!", "with Axie API!", "with humans!"]
+    await bot.change_presence(activity=discord.Game(random.choice(statuses)))
 
 bot.remove_command("help")
 if __name__ == "__main__":  # loading the features of the bot

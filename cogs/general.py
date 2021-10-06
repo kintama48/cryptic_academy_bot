@@ -310,7 +310,7 @@ class General(commands.Cog, name="general"):
                     embed.add_field(name='💔Losses', value=r['lose_total'])
                     embed.add_field(name='🛡️Draws', value=r['draw_total'])
                     embed.add_field(name='⚗Daily SLP',
-                                    value=str(self.get_total_slp(member_or_ronin_address)-self.get_daily_slp(member_or_ronin_address.replace('ronin:', '0x'))))
+                                    value=str(self.get_unclaimed_slp(member_or_ronin_address)-self.get_daily_slp(member_or_ronin_address.replace('ronin:', '0x'))))
                     embed.add_field(name='⚗SLP Current Balance', value=r['in_game_slp'])
                     embed.add_field(name='⚗Total SLP', value=r['total_slp'])
                     if scholar_percentage:

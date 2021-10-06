@@ -418,7 +418,7 @@ class General(commands.Cog, name="general"):
         """
         unclaimed = self.get_unclaimed_slp(ronin_address)
         t = datetime.fromtimestamp(self.get_last_claim(ronin_address))
-        days = (t - datetime.utcnow()).days * -1
+        days = (t - datetime.utcnow()).days * 1
         if days <= 0:
             return unclaimed
         return int(unclaimed / days)

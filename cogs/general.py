@@ -327,7 +327,7 @@ class General(commands.Cog, name="general"):
                                     value=datetime.fromtimestamp(int(f"{r['next_claim']}")).strftime(
                                         '%Y-%m-%d %H:%M:%S'))
                     if scholar_percentage:
-                        php, usd = self.convert_slp(scholar_percentage)
+                        php, usd = self.convert_slp(get_unclaimed_slp * scholar_percentage) 
                         embed.add_field(name='₱PHP Conversion', value=str(php))
                         embed.add_field(name='USD Conversion', value=str(usd))
                     else:

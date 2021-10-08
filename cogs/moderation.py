@@ -14,8 +14,8 @@ prefix = config['bot_prefix']
 
 
 def has_roles(context):
-    roles = [role.name for role in context.message.author.roles]
-    if "Admin" in roles:
+    roles = [role.id for role in context.message.author.roles]
+    if 868328584916385812 in roles:
         return True
     return False
 

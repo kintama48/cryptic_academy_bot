@@ -31,19 +31,21 @@ class Info(commands.Cog, name="info"):
     @commands.command(name="attackorder",
                       description=f"Info about attack order.")
     async def attackorder(self, context):
-        await context.send(content=context.message.author.mention,
-                           embed=discord.Embed(color=(0, 0xffff), description="**Higher Speed** > **Lower HP** > "
+        await context.reply(content=context.message.author.mention,
+                           embed=discord.Embed(color=randint(0, 0xffff), description="**Higher Speed** > **Lower HP** > "
                                                                               "**Higher Skill** > **Higher Morale** >"
                                                                               " **Lower Fighter ID**"))
 
     @commands.command(name="card",
                       description=f"Shows the information of the specified card. Syntax: '<prefix>card <part name | skill name'")
-    async def card(self, context, part_or_skill_name):
+    async def card(self, context, *args):
+        part_or_skill_name = " ".join(args)
         img = card_finder(part_or_skill_name)
         if img:
-            await context.send(content=context.author.mention, file=img)
+            file = discord.File(fp=img)
+            await context.reply(content=context.author.mention, file=file)
             return
-        await context.send(content=context.author.mention, embed=discord.Embed(color=0xffff, description=f'*Failed to find the`{part_or_skill_name}` card.*'))
+        await context.reply(content=context.author.mention, embed=discord.Embed(color=0xffff, description=f'*Failed to find the`{part_or_skill_name}` card.*'))
 
     @commands.command(name="buffs",
                       description=f"Info about buffs (Icon, Name, Description)")
@@ -52,7 +54,7 @@ class Info(commands.Cog, name="info"):
         embed.add_field(name=":attackup: **Attack Up**", value="Increases the next Attack by 20%.", inline=False)
         embed.add_field(name=":moraleup: **Morale Up**", value="Increases Morale by 20% for the next round.", inline=False)
         embed.add_field(name=":speedup: **Speed Up**", value="Increases Speed by 20% for the next round.", inline=False)
-        await context.send(content=context.message.author.mention, embed=embed)
+        await context.reply(content=context.message.author.mention, embed=embed)
 
     @commands.command(name="debuffs",
                       description=f"Info about debuffs (Icon, Name, Description)")
@@ -70,7 +72,7 @@ class Info(commands.Cog, name="info"):
         embed.add_field(name=":speeddown: **Speed Down**", value="Decreases Speed by 20% for the next round.", inline=False)
         embed.add_field(name=":stench: **Stench**", value="	Affected Axie loses target priority for the next round.", inline=False)
         embed.add_field(name=":stun: **Stun**", value="Next attack misses / Next incoming attack ignores shields.", inline=False)
-        await context.send(content=context.message.author.mention, embed=embed)
+        await context.reply(content=context.message.author.mention, embed=embed)
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error):

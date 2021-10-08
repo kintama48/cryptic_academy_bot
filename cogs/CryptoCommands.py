@@ -49,7 +49,7 @@ class CryptoCommands(commands.Cog, name="crypto"):
         embed.add_field(name=':SLP: SLP', value=assets['SLP'])
         embed.add_field(name=':AxieInfinity: Total Axies', value=assets['axies'])
         embed.timestamp = datetime.datetime.now()
-        await context.send(content=context.message.author.mention, embed=embed)
+        await context.reply(content=context.message.author.mention, embed=embed)
 
     @commands.command(name="slp",
                       description=f"Shows the current price of SLP (Price, 24H Change %, 24H High, 24H Low). Syntax: '<prefix>slp <currency> <amount>'")
@@ -67,7 +67,7 @@ class CryptoCommands(commands.Cog, name="crypto"):
                                                f"**₱ PHP:** {coin_data['low_24h']['php']}")
 
         embed.timestamp = datetime.datetime.now()
-        await context.send(content=context.message.author.mention, embed=embed)
+        await context.reply(content=context.message.author.mention, embed=embed)
         return
 
     @commands.command(name="axs",
@@ -86,7 +86,7 @@ class CryptoCommands(commands.Cog, name="crypto"):
                                                f"**₱ PHP:** {coin_data['low_24h']['php']}")
 
         embed.timestamp = datetime.datetime.now()
-        await context.send(content=context.message.author.mention, embed=embed)
+        await context.reply(content=context.message.author.mention, embed=embed)
         return
 
     @commands.command(name="gas",
@@ -125,7 +125,7 @@ class CryptoCommands(commands.Cog, name="crypto"):
                     embed.add_field(name='**Uniswap Trades:**', value=f'${range1_uniswap_usd} - ${range2_uniswap_usd}** ({range1_uniswap_eth} Ξ - {range2_uniswap_eth} Ξ)')
                     embed.timestamp = datetime.datetime.now()
                     embed.description = fees_eth
-                    await context.send(embed=embed)
+                    await context.reply(embed=embed)
                     return
                     # if currency.lower() == 'php':
                     #     embed.description = "**[Transaction Fees](https://axie.live)**\n\n" \
@@ -175,7 +175,7 @@ class CryptoCommands(commands.Cog, name="crypto"):
                     #                         f":axs:**Ethereum: Send AXS**\n" \
                     #                         f":slp:**Ethereum: Send SLP**\n"
                     #
-                    # await context.send(content=context.message.author.mention, embed=embed)
+                    # await context.reply(content=context.message.author.mention, embed=embed)
                     # return
                 else:
                     embed = discord.Embed(color=randint(0, 0xffff), description="⛽** [Gas Price](https://axie.live)**\n")
@@ -184,10 +184,10 @@ class CryptoCommands(commands.Cog, name="crypto"):
                     embed.add_field(name="**:red_car: Standard**", value=f'**{standard}**|3 minutes')
                     embed.add_field(name="**:bike: Slow**", value=f'**{slow}**|>10 minutes')
                     embed.timestamp = datetime.datetime.now()
-                    await context.send(content=context.message.author.mention, embed=embed)
+                    await context.reply(content=context.message.author.mention, embed=embed)
             else:
                 embed = discord.Embed(color=0xffff, description="Invalid currency entered.")
-                await context.send(content=context.message.author.menton, embed=embed)
+                await context.reply(content=context.message.author.menton, embed=embed)
                 return
         except:
             pass

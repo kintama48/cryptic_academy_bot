@@ -42,7 +42,7 @@ class MiscCommands(commands.Cog, name="misc"):
         embed = discord.Embed(color=randint(0, 0xffff), description="**Available Currencies**\n"
                                                                     "**     1. 💲USD**\n"
                                                                     "**     2. ₱PHP**\n")
-        await context.send(embed=embed)
+        await context.reply(embed=embed)
 
     @commands.command(name="ping",
                       description=f"Checks the Latency of the bot. Syntax: '<prefix>ping'")
@@ -52,7 +52,7 @@ class MiscCommands(commands.Cog, name="misc"):
             description=f"The bot latency is {round(self.bot.latency * 1000)}ms.",
             color=0xD5059D
         )
-        await context.send(embed=embed)
+        await context.reply(embed=embed)
 
     @commands.command(name="quote", description=f"Quotes what the user said. Syntax: '<prefix>quote <message>'")
     async def quote(self, context, *, args):
@@ -61,7 +61,7 @@ class MiscCommands(commands.Cog, name="misc"):
                 description=args,
                 color=0x42F56C
             )
-            await context.send(content=f"{context.author.mention} said: ", embed=embed)
+            await context.reply(content=f"{context.author.mention} said: ", embed=embed)
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error):

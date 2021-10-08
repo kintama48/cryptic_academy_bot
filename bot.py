@@ -2,6 +2,7 @@ import json
 import os
 import platform
 import sys
+import random
 
 import discord
 from discord.ext import commands, tasks
@@ -13,10 +14,10 @@ else:
     with open("config.json") as file:
         config = json.load(file)
 
-
 intents = discord.Intents.all()
 intents.members = True
 bot = Bot(command_prefix=config["bot_prefix"], intents=intents)
+
 
 @bot.event
 async def on_ready():
@@ -27,10 +28,18 @@ async def on_ready():
     print(f"Python version: {platform.python_version()}")
     print(f"Running on: {platform.system()} {platform.release()} ({os.name})")
 
+
 @tasks.loop(minutes=1.0)
-async def status_task():    # to set a game's status
+async def status_task():  # to set a game's status
     statuses = ["with you!", "with Axie API!", "with humans!"]
     await bot.change_presence(activity=discord.Game(random.choice(statuses)))
+
+
+@tasks.loop(minutes=1.0)
+async def status_task():  # set a game's status
+    statuses = ["with you!", "with Axie API!", "with humans!"]
+    await bot.change_presence(activity=discord.Game(random.choice(statuses)))
+
 
 bot.remove_command("help")
 if __name__ == "__main__":  # loading the features of the bot

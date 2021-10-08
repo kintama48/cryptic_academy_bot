@@ -38,7 +38,7 @@ class Help(commands.Cog, name="help"):
                 command_description = [command.description for command in commands]
                 help_text = '\n'.join(f'{prefix}{n} - {h}' for n, h in zip(command_list, command_description))
                 embed.add_field(name=i.capitalize(), value=f'```{help_text}```', inline=False)
-            await context.send(embed=embed)
+            await context.reply(embed=embed)
 
 
 def setup(bot):

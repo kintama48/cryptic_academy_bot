@@ -44,9 +44,9 @@ class CryptoCommands(commands.Cog, name="crypto"):
         assets = self.get_account_balances(ronin_address=ronin_address.replace('ronin:', '0x'))
         name = General.get_name(ronin_address=ronin_address.replace('ronin:', '0x'))
         embed = discord.Embed(color=randint(0, 0xfff), description=f"**{name}'s Holdings**\n\n*{ronin_address}*")
-        embed.add_field(name=':Ethereum: WETH', value=assets['WETH'])
-        embed.add_field(name=':AXS: AXS', value=assets['AXS'])
-        embed.add_field(name=':SLP: SLP', value=assets['SLP'])
+        embed.add_field(name='<:Ethereum:869408681362620436> WETH', value=assets['WETH'])
+        embed.add_field(name='<:AXS:896085438001979422> AXS', value=assets['AXS'])
+        embed.add_field(name='<:SLP:896085115803955242> SLP', value=assets['SLP'])
         embed.add_field(name=':AxieInfinity: Total Axies', value=assets['axies'])
         embed.timestamp = datetime.datetime.now()
         await context.reply(content=context.message.author.mention, embed=embed)
@@ -57,7 +57,7 @@ class CryptoCommands(commands.Cog, name="crypto"):
         coin = CoinGeckoAPI()
         coin_data = coin.get_coin_by_id(id='smooth-love-potion')['market_data']
 
-        embed = discord.Embed(color=randint(0, 0xffff), description="**:SLP: SLP's price in USD and PHP**")
+        embed = discord.Embed(color=randint(0, 0xffff), description="**<:SLP:896085115803955242> SLP's price in USD and PHP**")
         embed.add_field(name='$USD', value=str(round(coin_data['current_price']['usd'], 2)))
         embed.add_field(name='₱PHP', value=str(round(coin_data['current_price']['php'], 2)))
         embed.add_field(name=':chart_with_upwards_trend: 24h Change Percentage', value=str(round(coin_data["price_change_percentage_24h"], 2)))
@@ -76,7 +76,7 @@ class CryptoCommands(commands.Cog, name="crypto"):
         coin = CoinGeckoAPI()
         coin_data = coin.get_coin_by_id(id='axie-infinity')['market_data']
 
-        embed = discord.Embed(color=randint(0, 0xffff), description="**:AXS: AXS**")
+        embed = discord.Embed(color=randint(0, 0xffff), description="**<:AXS:896085438001979422> AXS**")
         embed.add_field(name='$USD', value=str(round(coin_data['current_price']['usd'], 2)))
         embed.add_field(name='₱PHP', value=str(round(coin_data['current_price']['php'], 2)))
         embed.add_field(name=':chart_with_upwards_trend: 24h Change Percentage', value=str(round(coin_data["price_change_percentage_24h"], 2)))
@@ -119,7 +119,7 @@ class CryptoCommands(commands.Cog, name="crypto"):
                     range2_uniswap_eth = calculate_eth_tx(fast, 200000)
                     range2_uniswap_usd = round(range2_uniswap_eth * eth_price, 2)
                     fees_eth = f"⛽** [Gas Price](https://axie.live)**\n\n**:rocket: Rapid: {fast}** **:airplane: Fast: {standard}** **:bike: Standard: {slow}**\n"
-                    embed.add_field(name="**:Ethereum: Simple ETH TX**", value=f"${simple_tx_fee_usd} ({simple_tx_fee_eth} Ξ)")
+                    embed.add_field(name="**<:Ethereum:869408681362620436> Simple ETH TX**", value=f"${simple_tx_fee_usd} ({simple_tx_fee_eth} Ξ)")
                     embed.add_field(name="**Token Approval (ERC20):**", value=f'${token_transfer_usd} ({token_transfer_eth} Ξ)')
                     embed.add_field(name='**Token Transfer (ERC20):**', value=f'${token_transfer_usd} ({token_transfer_eth} Ξ)')
                     embed.add_field(name='**Uniswap Trades:**', value=f'${range1_uniswap_usd} - ${range2_uniswap_usd}** ({range1_uniswap_eth} Ξ - {range2_uniswap_eth} Ξ)')

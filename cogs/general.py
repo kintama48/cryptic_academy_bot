@@ -297,17 +297,17 @@ class General(commands.Cog, name="general"):
                 embed.add_field(name='🗡️Wins', value=r['win_total'])
                 embed.add_field(name='💔Losses', value=r['lose_total'])
                 embed.add_field(name='🛡️Draws', value=r['draw_total'])
-                embed.add_field(name=':SLP: Daily SLP',
+                embed.add_field(name='<:SLP:896085115803955242> Daily SLP',
                                 value=str(self.get_daily_slp(ronin_address)[0]))
-                embed.add_field(name=':SLP: SLP Current Balance', value=r['in_game_slp'])
-                embed.add_field(name=':SLP: Total SLP', value=r['total_slp'])
+                embed.add_field(name='<:SLP:896085115803955242> SLP Current Balance', value=r['in_game_slp'])
+                embed.add_field(name='<:SLP:896085115803955242> Total SLP', value=r['total_slp'])
                 if scholar_percentage:
                     percent = self.get_unclaimed_slp(ronin_address) * scholar_percentage
-                    embed.add_field(name=':SLP: Scholar Share', value=str(percent))
+                    embed.add_field(name='<:SLP:896085115803955242> Scholar Share', value=str(percent))
                 else:
-                    embed.add_field(name=':SLP: Scholar Share', value=str(scholar_percentage))
+                    embed.add_field(name='<:SLP:896085115803955242> Scholar Share', value=str(scholar_percentage))
 
-                embed.add_field(name=':SLP: Average SLP',
+                embed.add_field(name='<:SLP:896085115803955242> Average SLP',
                                 value=str(self.get_daily_slp(ronin_address)[1]))
                 embed.add_field(name='🕰️Next SLP Claim',
                                 value=datetime.fromtimestamp(int(f"{r['next_claim']}")).strftime(

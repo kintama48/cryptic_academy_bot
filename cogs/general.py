@@ -1,15 +1,16 @@
 import json
 import os
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from random import randint
 
 import discord
-from discord.utils import get
+# from pyaxie_utils import get_battle_image
 import requests
 from discord.ext import commands
-#from pyaxie_utils import get_battle_image
-import psycopg2
+from discord.utils import get
+
+from utils.database_handling import Database
 
 if not os.path.isfile("config.json"):
     sys.exit("'config.json' not found! Add it and try again.")
@@ -29,6 +30,7 @@ def has_roles(context):
 
 class General(commands.Cog, name="general"):
     def __init__(self, bot):
+        self.db = Database()
         self.bot = bot
         self.url = "https://graphql-gateway.axieinfinity.com/graphql"
         self.url_api = "https://game-api.skymavis.com/game-api/"
@@ -46,11 +48,12 @@ class General(commands.Cog, name="general"):
         embed = discord.Embed(color=randint(0, 0xffff),
                               description=f":{(axie['class']).lower().strip()}: {axie['id']} - {axie['name']}")
         embed.add_field(name='Breed', value=f"**Breed Count:** {axie['breedCount']}/7\n")
-                                            # f"**Purity:** {axie['purity']}/6"
-                                            # f"**Quality:** {axie['quality']}%")
-        hyperlink = f"[{axie['ownerProfile']['name']}](https://marketplace.axieinfinity.com/profile/{axie['owner'].replace('0x','ronin:')}/)"
+        # f"**Purity:** {axie['purity']}/6"
+        # f"**Quality:** {axie['quality']}%")
+        hyperlink = f"[{axie['ownerProfile']['name']}](https://marketplace.axieinfinity.com/profile/{axie['owner'].replace('0x', 'ronin:')}/)"
         embed.add_field(name='Owner', value=hyperlink)
-        embed.add_field(name='Birthdate', value=str(datetime.fromtimestamp(int(axie['birthDate'])).strftime('%Y-%m-%d %H:%M:%S')))
+        embed.add_field(name='Birthdate',
+                        value=str(datetime.fromtimestamp(int(axie['birthDate'])).strftime('%Y-%m-%d %H:%M:%S')))
         embed.add_field(name=':green_heart: Health', value=axie['stats']['hp'])
         embed.add_field(name='⚡ Speed', value=axie['stats']['speed'])
         embed.add_field(name=':star2: Skill', value=axie['stats']['skill'])
@@ -122,7 +125,8 @@ class General(commands.Cog, name="general"):
         r = r.json()
         axies = r["data"]['axies']['results']
         axies = axies[0:2]
-        await context.reply(content=f"({self.get_name(ronin_address)})[(https://marketplace.axieinfinity.com/profile/{ronin_address}/axie)]'s axies: ")
+        await context.reply(
+            content=f"({self.get_name(ronin_address)})[(https://marketplace.axieinfinity.com/profile/{ronin_address}/axie)]'s axies: ")
         for i in axies:
             await context.reply(embed=self.axie_embed(i))
 
@@ -233,106 +237,52 @@ class General(commands.Cog, name="general"):
         embed.set_image(url=response['image'])
         await context.reply(content=context.message.author.mention, embed=embed)
 
-    @staticmethod
-    def delete_percentage(ronin_address):
-        ronin_address = ronin_address.replace('ronin:', '0x')
-        db = psycopg2.connect(host="ec2-52-86-123-180.compute-1.amazonaws.com", database="dat7agnicbs2gm",
-                              user="iwirbfnitvnsqc", port=5432,
-                              password="178c1ac45becf6badf4325b6f03c745863e5175494707405eaa43f8200d04292")
-        cur = db.cursor()
-        cur.execute('SELECT ronin FROM ronin_discord_id;')
-        list_of_ronins = list()
-        for i in cur.fetchall():
-            list_of_ronins.append(i[0])
-        if ronin_address in list_of_ronins:
-            cur.execute(
-                f"DELETE FROM ronin_discord_id WHERE ronin='{ronin_address}';")
-            db.commit()
-            cur.close()
-            db.close()
-            return "*Successfully deleted scholar percentage from the database!*"
-
-
     @commands.command(name="removeronin",
-                      description=f"Remove ronin:address and share from an account. For removing: '<prefix>removeronin <ronin:address>'")
-    async def removeronin(self, context, ronin_address):
-        ronin_address = ronin_address.replace('ronin:', '0x')
-        flag = False
-        for i in config['scholars']:
-            if config['scholars'][i] == ronin_address:
-                config['scholars'].pop(i)
-                self.delete_percentage(ronin_address)
-                with open('config.json', 'w') as file:
-                    json.dump(config, file)
-                    file.close()
-                await context.reply(embed=discord.Embed(color=randint(0, 0xffff), description="*Successfully removed.*"))
-                return
-        if not flag:
-            await context.reply(embed=discord.Embed(color=0xffff, description="*Address not found in the database.*"))
+                      description=f"Remove your ronin:address from your account. For removing: '<prefix>removeronin'")
+    async def removeronin(self, context):
+        r = self.db.remove_ronin_db(context.author.id)
+        await context.reply(embed=discord.Embed(color=randint(0, 0xffff), description=r))
+        return
 
     @commands.command(name="setronin",
                       description=f"Add ronin:address to your account. For adding: '<prefix>setronin <ronin:address>'")
     async def setronin(self, context, ronin_address):
-        ronin_address = ronin_address.replace('ronin:', '0x')
-        try:
-            if ronin_address:
-                if str(context.author.id) in config['scholars']:
-                    for i in config['scholars']:
-                        if i == str(context.author.id):
-                            config['scholars'][i] = ronin_address
-                            with open('config.json', 'w') as file:
-                                json.dump(config, file)
-                                file.close()
-                            return await context.reply(content=context.author.mention,
-                                                      embed=discord.Embed(color=randint(0, 0xffff),
-                                                                          description="*Successfully updated your ronin:address in the database!*"))
-                else:
-                    id = str(context.author.id)
-                    print(config['scholars'])
-                    config['scholars'][id] = ronin_address
-                    print(config['scholars'])
-                    with open('config.json', 'w') as file:
-                        json.dump(config, file)
-                        file.close()
-                    return await context.reply(content=context.author.mention, embed=discord.Embed(color=randint(0, 0xffff),
-                                                                                                  description="*Successfully added your ronin:address to the database!*"))
-        except:
-            return await context.reply(content=context.author.mention, embed=discord.Embed(color=0xfffff,
-                                                                                          description="*There was an error adding your ronin:address to the database!*"))
+        r = self.db.set_ronin_db(ronin_address, context.author.id)
+        await context.reply(embed=discord.Embed(color=randint(0, 0xffff), description=r))
+        return
 
     def get_avatar(self, ronin_address):
-        ronin_address = ronin_address.replace('ronin:', '0x')
-        for key in config['scholars']:
-            if config['scholars'][key] == ronin_address:
-                return int(key)
-        return None
+        r = self.db.get_scholar_by_ronin(ronin_address)
+        if r:
+            return r[0]
+        return
 
     @commands.command(name="stats",
                       description=f"Get the Player Stats of specified ronin:address (Current Balance, Unclaimed SLP, Total SLP, Claim Dates & etc.). Syntax: '<prefix>stats <ronin:address>'")
     async def stats(self, context, ronin_address=None):
         try:
             if '@' in ronin_address:
-                discord_id = (ronin_address.replace('<@!', '')[:-1])
-                if discord_id in config['scholars']:
-                    ronin_address = config['scholars'][discord_id]
+                discord_id = int((ronin_address.replace('<@!', '')[:-1]))
+                r = self.db.get_ronin_by_id(discord_id)
+                if r:
+                    ronin_address = r
                 else:
                     return await context.reply(content=context.author.mention, embed=discord.Embed(color=0xfffff,
-                                                                                                  description="*Mentioned user wasn't found in the database*"))
+                                                                                                   description="*Mentioned user wasn't found in the database*"))
             elif 'ronin:' in ronin_address or '0x' in ronin_address:
                 ronin_address = ronin_address.replace('ronin:', '0x')
         except:
-            discord_id = str(context.author.id)
-            if discord_id in config['scholars']:
-                ronin_address = config['scholars'][discord_id]
+            r = self.db.get_ronin_by_id(context.author.id)
+            if r:
+                ronin_address = r
             else:
                 return await context.reply(content=context.author.mention, embed=discord.Embed(color=0xfffff,
-                                                                                              description="*Mentioned user wasn't found in the database*"))
+                                                                                               description="*Your account wasn't found in the database*"))
         try:
-            ronin_address = ronin_address.replace('ronin:', '0x')
             id_avatar = self.get_avatar(ronin_address)
             r = ((requests.get(
-                f"https://game-api.axie.technology/api/v1/{(ronin_address).replace('ronin:', '0x')}")).json())
-            scholar_percentage = self.get_scholar_percentage(ronin_address)
+                f"https://game-api.axie.technology/api/v1/{(ronin_address)}")).json())
+            scholar_percentage = self.db.get_scholar_percentage(ronin=ronin_address)
             if r['success']:
                 embed = discord.Embed(color=randint(0, 0xffff),
                                       description=f"**Axie Infinity Profile: [{r['name']}](https://marketplace.axieinfinity.com/profile/{ronin_address}/axie)** \n\n**{ronin_address.replace('0x', 'ronin:')}**\n")
@@ -375,50 +325,13 @@ class General(commands.Cog, name="general"):
 
     @staticmethod
     def convert_slp(slp):
-        php = requests.get('https://api.coingecko.com/api/v3/simple/price?ids=smooth-love-potion&vs_currencies=php').json()['smooth-love-potion']['php']
-        usd = requests.get('https://api.coingecko.com/api/v3/simple/price?ids=smooth-love-potion&vs_currencies=usd').json()['smooth-love-potion']['usd']
+        php = \
+        requests.get('https://api.coingecko.com/api/v3/simple/price?ids=smooth-love-potion&vs_currencies=php').json()[
+            'smooth-love-potion']['php']
+        usd = \
+        requests.get('https://api.coingecko.com/api/v3/simple/price?ids=smooth-love-potion&vs_currencies=usd').json()[
+            'smooth-love-potion']['usd']
         return slp * php, slp * usd
-
-    @staticmethod
-    def get_scholar_percentage(ronin_address):
-        ronin_address = ronin_address.replace('ronin:', '0x')
-        db = psycopg2.connect(host="ec2-52-86-123-180.compute-1.amazonaws.com", database="dat7agnicbs2gm",
-                              user="iwirbfnitvnsqc", port=5432,
-                              password="178c1ac45becf6badf4325b6f03c745863e5175494707405eaa43f8200d04292")
-        cur = db.cursor()
-        cur.execute('SELECT ronin FROM ronin_discord_id;')
-        list_of_ronins = list()
-        for i in cur.fetchall():
-            list_of_ronins.append(i[0])
-        if ronin_address in list_of_ronins:
-            cur.execute(f"SELECT percentage FROM ronin_discord_id WHERE ronin='{ronin_address}';")
-            percentage = cur.fetchone()[0]
-            return float(percentage)
-        return None
-
-    @staticmethod
-    def set_scholar_percentage(discord_id, ronin_address, percentage):
-        ronin_address = ronin_address.replace('ronin:', '0x')
-        db = psycopg2.connect(host="ec2-52-86-123-180.compute-1.amazonaws.com", database="dat7agnicbs2gm",
-                              user="iwirbfnitvnsqc", port=5432,
-                              password="178c1ac45becf6badf4325b6f03c745863e5175494707405eaa43f8200d04292")
-        cur = db.cursor()
-        cur.execute('SELECT ronin FROM ronin_discord_id;')
-        list_of_ronins = list()
-        for i in cur.fetchall():
-            list_of_ronins.append(i[0])
-        if ronin_address in list_of_ronins:
-            cur.execute(f"UPDATE ronin_discord_id SET ronin='{ronin_address}', discord_id={discord_id}, percentage={percentage} where ronin='{ronin_address}';")
-            db.commit()
-            cur.close()
-            db.close()
-            return "*Successfully updated your scholar percentage in the database!*"
-        else:
-            cur.execute(f"INSERT INTO ronin_discord_id (ronin, discord_id, percentage) VALUES ('{ronin_address}', {discord_id}, {percentage})")
-            db.commit()
-            cur.close()
-            db.close()
-            return "*Successfully added your scholar percentage to the database!*"
 
     @commands.command(name="share",
                       description=f"Set your scholar share. Syntax: '<prefix>share <percentage>'")
@@ -430,27 +343,24 @@ class General(commands.Cog, name="general"):
             percentage = int(percentage.replace('%', ''))
 
         if percentage > 1:
-            percentage = percentage/100
+            percentage = percentage / 100
 
         if percentage < 0.4 or percentage > 0.6:
-            return await context.reply(content=context.author.id, embed=discord.Embed(color=0xffff, description="*Share can only be between 40-60%. Please try again.*"))
+            return await context.reply(content=context.author.id, embed=discord.Embed(color=0xffff,
+                                                                                      description="*Share can only be between 40-60%. Please try again.*"))
 
-        if str(context.author.id) in config['scholars']:
-            for i in config['scholars']:
-                if i == str(context.author.id):
-                    ronin_address = config['scholars'][i]
-                    discord_id = i
-                    break
+        r = self.db.set_scholar_percentage(context.author.id, percentage)
+        await context.reply(embed=discord.Embed(color=randint(0, 0xffff), description=r))
 
-        if ronin_address:
-            response = self.set_scholar_percentage(int(discord_id), ronin_address, percentage)
-            await context.reply(embed=discord.Embed(color=randint(0, 0xffff), description=response))
-        else:
-            await context.reply(embed=discord.Embed(color=0xffff, description="*ERROR: Couldn't find your ronin address in the database. Please use the `<prefix>setronin` command first.*"))
+    @commands.command(name="removeshare",
+                      description=f"Remove your scholar share. Syntax: '<prefix>removeshare'")
+    async def remove_share(self, context):
+        r = self.db.delete_percentage(context.author.id)
+        await context.reply(embed=discord.Embed(color=randint(0, 0xffff), description=r))
 
     @staticmethod
     def get_total_slp(ronin_address):
-        r = requests.get(f"https://game-api.axie.technology/api/v1/{ronin_address.replace('ronin:','0x')}/")
+        r = requests.get(f"https://game-api.axie.technology/api/v1/{ronin_address.replace('ronin:', '0x')}/")
         r = r.json()
         return r['total_slp']
 
@@ -459,7 +369,6 @@ class General(commands.Cog, name="general"):
         url = f"https://axie-infinity.p.rapidapi.com/get-update/{ronin_address}"
         r = requests.get(url=url, headers=self.rapid_api_header, params={'id': ronin_address}).json()
         return r['slp']['todaySoFar'], r['slp']['average']
-
 
     def get_unclaimed_slp(self, ronin_address):
         """

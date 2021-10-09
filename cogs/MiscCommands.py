@@ -40,7 +40,7 @@ class MiscCommands(commands.Cog, name="misc"):
                       description=f"Shows the list of all available currencies. Syntax: '<prefix>currency'")
     async def currency(self, context):
         embed = discord.Embed(color=randint(0, 0xffff), description="**Available Currencies**\n"
-                                                                    "**     1. 💲USD**\n"
+                                                                    "**     1. $USD**\n"
                                                                     "**     2. ₱PHP**\n")
         await context.reply(embed=embed)
 

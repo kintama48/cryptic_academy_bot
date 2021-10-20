@@ -3,9 +3,9 @@ import psycopg2
 
 class Database:
     def __init__(self):
-        self.db = psycopg2.connect(host="ec2-52-86-123-180.compute-1.amazonaws.com", database="dat7agnicbs2gm",
-                                   user="iwirbfnitvnsqc", port=5432,
-                                   password="178c1ac45becf6badf4325b6f03c745863e5175494707405eaa43f8200d04292")
+        self.db = psycopg2.connect(host="fanny.db.elephantsql.com", database="ysgqpqgi",
+                                   user="ysgqpqgi",
+                                   password="0XEpzABH19jFVx_DxgZF3glt9tigeN2y")
 
     def get_scholar_percentage(self, discord_id: int=None, ronin=None):
         if discord_id:

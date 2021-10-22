@@ -345,7 +345,7 @@ class General(commands.Cog, name="general"):
         if percentage > 1:
             percentage = percentage / 100
 
-        if percentage < 0.4 or percentage > 0.6:
+        if percentage < 0.25 or percentage > 0.6:
             return await context.reply(content=context.author.id, embed=discord.Embed(color=0xffff,
                                                                                       description="*Share can only be between 40-60%. Please try again.*"))
 
